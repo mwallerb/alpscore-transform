@@ -1,0 +1,20 @@
+## generated files
+*.pyc
+*.o
+*.so
+*.dSYM/
+*.test
+
+## Setuptools generated files
+build*/
+*.egg-info/
+dist/
+*.kdev*
+
+## misc files
+.*
+*~
+\#*\#
+*.patch
+*.orig
+*.old
