@@ -78,7 +78,7 @@ endif()
 
 install(DIRECTORY include/
         DESTINATION include/
-        FILES_MATCHING PATTERN "*.hh"
+        FILES_MATCHING PATTERN "*.hpp"
         )
 install(TARGETS transform-lib
         RUNTIME DESTINATION "bin/"
