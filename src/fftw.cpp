@@ -64,6 +64,18 @@ wrapper<InT, OutT>::~wrapper()
         fftw_destroy_plan(plan_);
 }
 
+template <typename InT, typename OutT>
+void wrapper<InT, OutT>::execute_on(InT *in_n, OutT *out_n)
+{
+    if (DEBUG && !(data_.flags & FFTW_UNALIGNED)) {
+        if (fftw_alignment_of((double*)in_n) != fftw_alignment_of((double*)(in())))
+            throw alignment_mismatch();
+        if (fftw_alignment_of((double*)out_n) != fftw_alignment_of((double*)(out())))
+            throw alignment_mismatch();
+    }
+    execute_plan(plan_, in_n, out_n);
+}
+
 template class wrapper< std::complex<double>, double >;
 template class wrapper< double, std::complex<double> >;
 template class wrapper< std::complex<double>, std::complex<double> >;

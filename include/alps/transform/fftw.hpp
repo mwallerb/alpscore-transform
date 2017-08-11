@@ -45,6 +45,7 @@ typedef fftw_plan_s *fftw_plan;
 #define FFTW_ESTIMATE       1
 #define FFTW_DESTROY_INPUT  1
 #define FFTW_PRESERVE_INPUT 1
+#define FFTW_UNALIGNED      2
 #define FFTW_FORWARD        -1
 #define FFTW_BACKWARD       +1
 
@@ -68,11 +69,22 @@ static inline fftw_plan fftw_plan_many_dft_c2r(int, const int *, int,
 
 static inline void fftw_execute(const fftw_plan) FFTW_DUMMY_
 
+static inline void fftw_execute_dft(const fftw_plan,
+                                    fftw_complex *, fftw_complex *) FFTW_DUMMY_
+
+static inline void fftw_execute_dft_r2c(const fftw_plan,
+                                        double *, fftw_complex *) FFTW_DUMMY_
+
+static inline void fftw_execute_dft_c2r(const fftw_plan,
+                                        fftw_complex *, double *) FFTW_DUMMY_
+
 static inline void fftw_destroy_plan(fftw_plan) FFTW_DUMMY_
 
 static inline double *fftw_alloc_real(size_t) FFTW_DUMMY_
 
 static inline fftw_complex *fftw_alloc_complex(size_t) FFTW_DUMMY_
+
+static inline int fftw_alignment_of(double *) FFTW_DUMMY_
 
 static inline void fftw_free(void *) FFTW_DUMMY_
 
@@ -94,6 +106,7 @@ static const bool DEBUG = true;
 static const bool DEBUG = false;
 #endif
 
+struct alignment_mismatch : std::exception { };
 
 /** Helper function for memory-aligned allocation from FFTW */
 template <typename T>
@@ -196,6 +209,26 @@ template <> fftw_plan create_plan(plan_data, std::complex<double> *, std::comple
 template <> fftw_plan create_plan(plan_data, std::complex<double> *, double *);
 template <> fftw_plan create_plan(plan_data, double *, std::complex<double> *);
 
+/**
+ * Wrapper for executing plans
+ */
+template <typename InT, typename OutT>
+inline void execute_plan(const fftw_plan data, InT *in, OutT *out);
+
+template <>
+inline void execute_plan(const fftw_plan p, std::complex<double> *in, std::complex<double> *out) {
+    fftw_execute_dft(p, (fftw_complex *)in, (fftw_complex *)out);
+}
+
+template <>
+inline void execute_plan(const fftw_plan p, std::complex<double> *in, double *out) {
+    fftw_execute_dft_c2r(p, (fftw_complex *)in, out);
+}
+
+template <>
+inline void execute_plan(const fftw_plan p, double *in, std::complex<double> *out) {
+    fftw_execute_dft_r2c(p, in, (fftw_complex *)out);
+}
 
 /**
  * Memory-safe wrapper for a FFTW plan.
@@ -226,11 +259,13 @@ public:
 
     void execute() { fftw_execute(plan_); }
 
-    void execute_on(OutT *out, InT *in);
+    void execute_on(InT *in, OutT *out);
 
     const plan_data &data() const { return data_; }
 
     const fftw_plan &plan() const { return plan_; }
+
+    unsigned size() const { return in_.size(); }
 
     const InT *in() const { return &in_[0]; }
 

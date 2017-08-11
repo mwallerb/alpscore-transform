@@ -64,18 +64,18 @@ class iw_to_tau_real
 public:
     iw_to_tau_real() { }
 
-    iw_to_tau_real(unsigned niw, int ntau, double beta, statistics stat,
-                    bool use_fftw=fftw::SUPPORTED);
+    iw_to_tau_real(unsigned int niw, unsigned int ntau, double beta,
+                   statistics stat, bool use_fftw = fftw::SUPPORTED);
 
+    void operator() (const std::complex<double> *in, double *out);
 
-
-
-    void naive(double *out, const std::complex<double> *in) const;
+    void naive(const std::complex<double> *in, double *out) const;
 
 private:
-    dft dft_;
-    unsigned niw_, ntau_;
+    unsigned niw_, ntau_, oversampling_;
     double beta_;
+    statistics stat_;
+    fftw::wrapper<> fft_;
 };
 
 
