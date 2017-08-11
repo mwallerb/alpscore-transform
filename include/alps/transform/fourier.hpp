@@ -54,17 +54,12 @@ private:
 };
 
 template <>
-struct transform_traits<dft>
+struct traits<dft>
 {
     typedef std::complex<double> in_type;
     typedef std::complex<double> out_type;
 };
 
-enum statistics
-{
-    bosonic = 0,
-    fermionic = 1
-};
 
 /**
  * Transformation from positive Matsubara frequencies to imaginary time.
@@ -103,7 +98,7 @@ private:
 };
 
 template<>
-struct transform_traits<iw_to_tau_real>
+struct traits<iw_to_tau_real>
 {
     typedef std::complex<double> in_type;
     typedef double out_type;
@@ -147,12 +142,11 @@ private:
 };
 
 template<>
-struct transform_traits<tau_to_iw_real>
+struct traits<tau_to_iw_real>
 {
     typedef double in_type;
     typedef std::complex<double> out_type;
 };
-
 
 }} /* alps::transform */
 

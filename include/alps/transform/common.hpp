@@ -7,6 +7,7 @@
 #define ALPS_TRANSFORM_COMMON_HPP
 
 #include <vector>
+#include <complex>
 #include <stdexcept>
 
 namespace alps { namespace transform {
@@ -16,32 +17,36 @@ namespace alps { namespace transform {
  *
  * You should specialize this template for every transformer in such a way:
  *
- *     template <> struct transform_traits<my_transformer>
+ *     template <> struct traits<my_transformer>
  *     {
  *         typedef double in_type;                  // input type
  *         typedef double out_type;                 // output type
  *     };
  */
 template <typename T>
-struct transform_traits;
+struct traits;
 
 /**
  * Convenience function that transforms vector
  */
 template <typename T>
-std::vector<typename transform_traits<T>::out_type> apply(
-                    T &tf,
-                    const std::vector<typename transform_traits<T>::in_type> &in
-                    )
+std::vector<typename traits<T>::out_type> apply(
+                    T &tf, const std::vector<typename traits<T>::in_type> &in)
 {
     if (tf.in_size() != in.size())
         throw std::runtime_error("size mismatch");
 
-    typedef typename transform_traits<T>::out_type out_type;
-    std::vector<out_type> out(tf.out_size(), out_type(0));
+    std::vector<typename traits<T>::out_type> out(tf.out_size(), 0.0);
     tf(&in[0], &out[0]);
     return out;
 }
+
+/** Enumeration for different signal periodicities */
+enum statistics
+{
+    bosonic = 0,
+    fermionic = 1
+};
 
 }}
 
