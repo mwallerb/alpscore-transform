@@ -87,8 +87,7 @@ public:
     tau_to_iw_real() { }
 
     tau_to_iw_real(unsigned int ntau, unsigned int niw, double beta,
-                   bool tau_shifted, statistics stat,
-                   bool use_fftw=fftw::SUPPORTED);
+                   statistics stat, bool use_fftw=fftw::SUPPORTED);
 
     void operator() (const double *in, std::complex<double> *out);
 
@@ -97,16 +96,9 @@ public:
 private:
     unsigned niw_, ntau_, oversampling_;
     double beta_;
-    bool tau_shifted_;
     statistics stat_;
     fftw::wrapper<> fft_;
 };
-
-
-
-
-
-
 
 }} /* alps::transform */
 
