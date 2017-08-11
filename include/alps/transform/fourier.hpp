@@ -8,8 +8,6 @@
 
 #include "fftw.hpp"
 
-namespace fftw = alps::fftw;
-
 namespace alps { namespace transform {
 
 /**
@@ -27,7 +25,7 @@ class dft
 public:
     dft() : fftw_() { }
 
-    dft(unsigned n, int direction, bool use_fftw=fftw::SUPPORTED);
+    dft(unsigned n, int direction, bool use_fftw=alps::fftw::SUPPORTED);
 
     void operator() (std::complex<double> *out, const std::complex<double> *in);
 
@@ -37,15 +35,15 @@ public:
 
     bool use_fftw() const { return fftw_.is_initialized(); }
 
-    const fftw::wrapper<> &fftw() const { return fftw_; }
+    const alps::fftw::wrapper<> &fftw() const { return fftw_; }
 
     void naive(std::complex<double> *out, const std::complex<double> *in) const;
 
 protected:
-    fftw::wrapper<> &fftw() { return fftw_; }
+    alps::fftw::wrapper<> &fftw() { return fftw_; }
 
 private:
-    fftw::wrapper<> fftw_;
+    alps::fftw::wrapper<> fftw_;
     unsigned n_;
     int direction_;
 };
@@ -65,7 +63,7 @@ public:
     iw_to_tau_real() { }
 
     iw_to_tau_real(unsigned int niw, unsigned int ntau, double beta,
-                   statistics stat, bool use_fftw=fftw::SUPPORTED);
+                   statistics stat, bool use_fftw=alps::fftw::SUPPORTED);
 
     void operator() (const std::complex<double> *in, double *out);
 
@@ -75,7 +73,7 @@ private:
     unsigned niw_, ntau_, oversampling_;
     double beta_;
     statistics stat_;
-    fftw::wrapper<> fft_;
+    alps::fftw::wrapper<> fft_;
 };
 
 /**
@@ -87,7 +85,7 @@ public:
     tau_to_iw_real() { }
 
     tau_to_iw_real(unsigned int ntau, unsigned int niw, double beta,
-                   statistics stat, bool use_fftw=fftw::SUPPORTED);
+                   statistics stat, bool use_fftw=alps::fftw::SUPPORTED);
 
     void operator() (const double *in, std::complex<double> *out);
 
@@ -97,7 +95,7 @@ private:
     unsigned niw_, ntau_, oversampling_;
     double beta_;
     statistics stat_;
-    fftw::wrapper<> fft_;
+    alps::fftw::wrapper<> fft_;
 };
 
 }} /* alps::transform */

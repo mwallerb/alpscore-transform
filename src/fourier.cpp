@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cassert>
 
+namespace fftw = alps::fftw;
+
 namespace alps { namespace transform {
 
 dft::dft(unsigned n, int direction, bool use_fftw)
