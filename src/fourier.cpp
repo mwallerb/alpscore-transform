@@ -17,7 +17,7 @@ dft::dft(unsigned n, int direction, bool use_fftw)
         fftw_ = fftw::wrapper<>(fftw::plan_data(n, direction, FFTW_ESTIMATE));
 }
 
-void dft::operator() (std::complex<double> *out, const std::complex<double> *in)
+void dft::operator() (const std::complex<double> *in, std::complex<double> *out)
 {
     if (use_fftw()) {
         // copy to internal buffers
@@ -25,11 +25,11 @@ void dft::operator() (std::complex<double> *out, const std::complex<double> *in)
         fftw().execute();
         std::copy(fftw().out(), fftw().out() + n_, out);
     } else {
-        naive(out, in);
+        naive(in, out);
     }
 }
 
-void dft::naive(std::complex<double> *out, const std::complex<double> *in) const
+void dft::naive(const std::complex<double> *in, std::complex<double> *out) const
 {
     // naive implementation of the formula
     //         f_hat[k] = sum_j exp(+2pi i/N k j) f_conv[j]

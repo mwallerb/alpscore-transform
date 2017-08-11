@@ -34,7 +34,7 @@ struct fftw_not_available : public std::exception
 #include <cstdlib>
 #include <complex>
 
-typedef double (fftw_complex)[2];
+typedef std::pair<double, double> fftw_complex;
 
 // Dummy library for FFTW3
 struct fftw_plan_s;

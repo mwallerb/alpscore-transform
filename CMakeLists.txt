@@ -104,7 +104,7 @@ if(WITH_SWIG)
 
     set_source_files_properties(swig/transform.i PROPERTIES
                                 CPLUSPLUS ON
-                                SWIG_FLAGS "-includeall"
+                                #SWIG_FLAGS "-includeall"
                                 )
     #file(GLOB SWIG_MODULE_ctint_EXTRA_DEPS swig/*.inc.i)
 

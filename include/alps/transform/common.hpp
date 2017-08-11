@@ -39,11 +39,9 @@ std::vector<typename transform_traits<T>::out_type> apply(
 
     typedef typename transform_traits<T>::out_type out_type;
     std::vector<out_type> out(tf.out_size(), out_type(0));
-    tf(&out[0], &in[0]);
+    tf(&in[0], &out[0]);
     return out;
 }
-
-
 
 }}
 
