@@ -79,20 +79,79 @@ void iw_to_tau_real::operator() (const std::complex<double> *in, double *out)
 
         // this quantity should now be real!
         assert(std::abs(ftau.imag()) < 1e-10 * std::abs(ftau.real()));
-        out[n] = ftau.real();
+        out[n] += ftau.real();
     }
 }
 
 void iw_to_tau_real::naive(const std::complex<double> *in, double *out) const
 {
     for (unsigned i = 0; i != ntau_; ++i) {
-        out[i] = 0.;
         for (unsigned k = 0; k != niw_; ++k) {
             double wt = M_PI * (2*k + (unsigned)stat_) * i/ntau_;
-            out[i]+= 2/beta_ * (cos(wt)*in[k].real() + sin(wt)*in[k].imag());
+            out[i] += 2/beta_ * (cos(wt)*in[k].real() + sin(wt)*in[k].imag());
         }
     }
 }
 
+tau_to_iw_real::tau_to_iw_real(unsigned ntau, unsigned niw, double beta,
+                               bool tau_shifted, statistics stat, bool use_fftw)
+    : niw_(niw)
+    , ntau_(ntau)
+    , beta_(beta)
+    , tau_shifted_(tau_shifted)
+    , stat_(stat)
+    , fft_()
+{
+    // To be on the safe side, make sure that the tau axis is always larger
+    // than the frequency axis (we can always "pad" the frequencies with
+    // zeros).
+    oversampling_ = std::ceil(1 * niw/ntau);
+
+    if (use_fftw) {
+        fft_ = fftw::wrapper<>(fftw::plan_data(ntau_ * oversampling_,
+                                               +1, FFTW_ESTIMATE));
+    }
+}
+
+void tau_to_iw_real::operator() (const double *in, std::complex<double> *out)
+{
+    if (!fft_.is_initialized()) {
+        naive(in, out);
+        return;
+    }
+
+    std::complex<double> norm = beta_/ntau_;
+    if (stat_ == fermionic && tau_shifted_)
+        norm *= std::exp(std::complex<double>(0, M_PI/(2 * fft_.size())));
+
+    for (unsigned n = 0; n != ntau_; ++n) {
+        std::complex<double> ftau = in[n];
+        if (stat_ == fermionic)
+            ftau *= std::exp(std::complex<double>(0, M_PI * n / ntau_));
+
+        fft_.in()[n * oversampling_] = ftau * norm;
+    }
+
+    fft_.execute();
+
+    for (unsigned k = 0; k != niw_; ++k) {
+        std::complex<double> fiw = fft_.out()[k];
+        if (tau_shifted_)
+            fiw *= std::exp(std::complex<double>(0, M_PI * k/fft_.size()));
+
+        out[k] += fiw;
+    }
+}
+
+void tau_to_iw_real::naive(const double *in, std::complex<double> *out) const
+{
+    for (unsigned k = 0; k != niw_; ++k) {
+        for (unsigned i = 0; i != ntau_; ++i) {
+            double wt = M_PI * (2*k + (unsigned)stat_) * (i + (tau_shifted_ ? 0.5 : 0))/ntau_;
+            out[k] += beta_/ntau_
+                      * std::complex<double>(cos(wt) * in[i], sin(wt) * in[i]);
+        }
+    }
+}
 
 }}

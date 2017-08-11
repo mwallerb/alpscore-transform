@@ -65,7 +65,7 @@ public:
     iw_to_tau_real() { }
 
     iw_to_tau_real(unsigned int niw, unsigned int ntau, double beta,
-                   statistics stat, bool use_fftw = fftw::SUPPORTED);
+                   statistics stat, bool use_fftw=fftw::SUPPORTED);
 
     void operator() (const std::complex<double> *in, double *out);
 
@@ -77,6 +77,34 @@ private:
     statistics stat_;
     fftw::wrapper<> fft_;
 };
+
+/**
+ * Transformation from matsubara frequencies to imaginary time.
+ */
+class tau_to_iw_real
+{
+public:
+    tau_to_iw_real() { }
+
+    tau_to_iw_real(unsigned int ntau, unsigned int niw, double beta,
+                   bool tau_shifted, statistics stat,
+                   bool use_fftw=fftw::SUPPORTED);
+
+    void operator() (const double *in, std::complex<double> *out);
+
+    void naive(const double *in, std::complex<double> *out) const;
+
+private:
+    unsigned niw_, ntau_, oversampling_;
+    double beta_;
+    bool tau_shifted_;
+    statistics stat_;
+    fftw::wrapper<> fft_;
+};
+
+
+
+
 
 
 
