@@ -60,7 +60,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 include_directories(include)
 
 add_library(transform-lib SHARED
-            src/fftw.cpp src/fourier.cpp)
+            src/fftw.cpp src/fourier.cpp src/nonuniform.cpp)
 set_target_properties(transform-lib PROPERTIES
                       OUTPUT_NAME alps-transform
                       INTERPROCEDURAL_OPTIMIZATION True
