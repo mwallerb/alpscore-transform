@@ -14,30 +14,48 @@
 
 namespace alps { namespace transform {
 
-template <typename T>
-class ntau_to_gauss
+class gaussian_window
 {
 public:
-    ntau_to_gauss(unsigned niw, unsigned sigma, unsigned width);
+    gaussian_window();
+
+    gaussian_window(unsigned niw, unsigned sigma, unsigned half_width,
+                    double beta);
 
     void set_tau(double *tau, unsigned ntau);
 
-    void operator() (const T *in, T *out);
+    template <typename T>
+    void convolve_tau(const T *in, T *out);
 
-    unsigned in_size() const { return zeroval_.size(); }
+    void deconvolve_iw(const std::complex<double> *in, std::complex<double> *out);
 
-    unsigned out_size() const { return 2 * (niw_ * sigma_ + width_); }
+    unsigned tau_size() const { return zeroval_.size(); }
+
+    unsigned conv_size() const { return 2 * niw_ * sigma_ + 4 * half_width_; }
+
+    unsigned iw_size() const { return niw_; }
+
+    template <typename T>
+    void convolve_tau_naive(const T *in, T *out);
 
 private:
-    unsigned niw_, sigma_, width_;
+    unsigned niw_, sigma_, half_width_;
+    double beta_;
+
+    double tnorm_, texp_, knorm_, kexp_;
     std::vector<double> lfact_;
 
-    std::vector<T> zeroval_;
+    std::vector<double> zeroval_;
     std::vector<double> step_;
 };
 
-extern template class ntau_to_gauss<double>;
-extern template class ntau_to_gauss< std::complex<double> >;
+template <> void gaussian_window::convolve_tau(const double *, double *);
+template <> void gaussian_window::convolve_tau(const std::complex<double>*, std::complex<double>*);
+
+template <> void gaussian_window::convolve_tau_naive(const double *, double *);
+template <> void gaussian_window::convolve_tau_naive(const std::complex<double>*, std::complex<double>*);
+
+
 
 } }
 
