@@ -10,7 +10,11 @@
 %{
 #define SWIG_FILE_WITH_INIT
 
+#include <alps/transform/common.hpp>
+#include <alps/transform/fftw.hpp>
 #include <alps/transform/fourier.hpp>
+#include <alps/transform/model.hpp>
+#include <alps/transform/nonuniform.hpp>
 %}
 
 /*
@@ -49,4 +53,9 @@
 /* ---------------------------- */
 
 %include <alps/transform/fourier.hpp>
+
+/* ---------------------------- */
+
+%include <alps/transform/nonuniform.hpp>
+
 

@@ -19,43 +19,42 @@ class gaussian_window
 public:
     gaussian_window();
 
-    gaussian_window(unsigned niw, unsigned sigma, unsigned half_width,
+    gaussian_window(unsigned nfreq, unsigned sigma, unsigned half_width,
                     double beta);
 
     void set_tau(double *tau, unsigned ntau);
 
     template <typename T>
-    void convolve_tau(const T *in, T *out);
+    void convolve_tau(const T *in, T *out) const;
 
-    void deconvolve_iw(const std::complex<double> *in, std::complex<double> *out);
+    void deconvolve_freq(const std::complex<double> *in, std::complex<double> *out);
 
-    unsigned tau_size() const { return zeroval_.size(); }
+    unsigned tau_size() const { return precomp_.size(); }
 
-    unsigned conv_size() const { return 2 * niw_ * sigma_ + 4 * half_width_; }
+    unsigned conv_size() const { return nfreq_ * sigma_ + 4 * half_width_; }
 
-    unsigned iw_size() const { return niw_; }
+    unsigned freq_size() const { return nfreq_; }
 
     template <typename T>
-    void convolve_tau_naive(const T *in, T *out);
+    void convolve_fx_naive(const T *in, T *out);
 
 private:
-    unsigned niw_, sigma_, half_width_;
+    unsigned nfreq_, sigma_, half_width_;
     double beta_;
 
     double tnorm_, texp_, knorm_, kexp_;
     std::vector<double> lfact_;
 
-    std::vector<double> zeroval_;
-    std::vector<double> step_;
+    struct tau_point {
+        unsigned start;
+        double baseval;
+        double step;
+    };
+    std::vector<tau_point> precomp_;
 };
 
-template <> void gaussian_window::convolve_tau(const double *, double *);
-template <> void gaussian_window::convolve_tau(const std::complex<double>*, std::complex<double>*);
-
-template <> void gaussian_window::convolve_tau_naive(const double *, double *);
-template <> void gaussian_window::convolve_tau_naive(const std::complex<double>*, std::complex<double>*);
-
-
+template <> void gaussian_window::convolve_tau(const double *, double *) const;
+template <> void gaussian_window::convolve_tau(const std::complex<double>*, std::complex<double>*) const;
 
 } }
 
