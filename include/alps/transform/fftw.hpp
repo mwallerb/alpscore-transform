@@ -245,7 +245,7 @@ class wrapper
 public:
     wrapper();
 
-    wrapper(const plan_data &data);
+    explicit wrapper(const plan_data &data);
 
     wrapper(const wrapper &other);
 
