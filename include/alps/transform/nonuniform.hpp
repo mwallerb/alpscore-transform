@@ -48,9 +48,11 @@ private:
     std::vector<tau_point> precomp_;
 };
 
+#ifndef SWIG
 extern template void conv_gaussian::operator()<>(const double *, double *) const;
 extern template void conv_gaussian::operator()<>(
                     const std::complex<double>*, std::complex<double>*) const;
+#endif
 
 } }
 

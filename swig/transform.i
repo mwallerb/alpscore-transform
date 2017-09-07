@@ -38,8 +38,10 @@
     %extend alps::transform::class {
         %ignore class();
         %ignore operator() (const in_type *in, out_type *out);
+
         %apply (in_type *IN_ARRAY1, int DIM1) { (const in_type *in, int nin) };
         %apply (out_type *INPLACE_ARRAY1, int DIM1) { (out_type *out, int nout) };
+        %catches(std::runtime_error);
         void operator() (const in_type *in, int nin, out_type *out, int nout)
         {
             if (nin != self->in_size())
@@ -71,19 +73,17 @@
 
 /* --------------------------- FOURIER ---------------------------- */
 
+
 TRANSFORM(dft, std::complex<double>, std::complex<double>)
 TRANSFORM(iw_to_tau_real, std::complex<double>, double)
 TRANSFORM(tau_to_iw_real, double, std::complex<double>)
 
 %include <alps/transform/fourier.hpp>
 
-/* --------------------------- NONUNIFORM ----------------------------
+/* --------------------------- NONUNIFORM ---------------------------- */
 
 TRANSFORM(conv_gaussian, double, double)
 
 %include <alps/transform/nonuniform.hpp>
 
-/*
-%template(convolve_tauR) alps::transform::conv_gaussian::operator()<double>;
-%template(convolve_tauC) alps::transform::conv_gaussian::operator()< std::complex<double> >;
-*/
+
