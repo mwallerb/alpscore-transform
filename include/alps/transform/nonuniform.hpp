@@ -27,13 +27,11 @@ public:
     template <typename T>
     void operator() (const T *in, T *out) const;
 
-    unsigned tau_size() const { return precomp_.size(); }
+    unsigned in_size() const { return precomp_.size(); }
 
-    unsigned conv_size() const { return nfreq_ * sigma_ + 2 * width(); }
+    unsigned out_size() const { return nfreq_ * sigma_ + 2 * window_width(); }
 
-    unsigned freq_size() const { return nfreq_; }
-
-    unsigned width() const { return 2 * half_width_; }
+    unsigned window_width() const { return 2 * half_width_; }
 
 private:
     unsigned nfreq_, sigma_, half_width_;
@@ -50,8 +48,9 @@ private:
     std::vector<tau_point> precomp_;
 };
 
-template <> void conv_gaussian::operator()(const double *, double *) const;
-template <> void conv_gaussian::operator()(const std::complex<double>*, std::complex<double>*) const;
+extern template void conv_gaussian::operator()<>(const double *, double *) const;
+extern template void conv_gaussian::operator()<>(
+                    const std::complex<double>*, std::complex<double>*) const;
 
 } }
 

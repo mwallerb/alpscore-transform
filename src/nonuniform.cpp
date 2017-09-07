@@ -4,6 +4,15 @@
 
 namespace alps { namespace transform {
 
+conv_gaussian::conv_gaussian()
+    : nfreq_(0)
+    , sigma_(1)
+    , half_width_(0)
+    , beta_(1)
+    , lfact_()
+    , precomp_()
+{ }
+
 conv_gaussian::conv_gaussian(unsigned nfreq, unsigned sigma,
                              unsigned half_width, double beta)
     : nfreq_(nfreq)
@@ -57,7 +66,7 @@ void conv_gaussian::set_tau(double *tau, unsigned ntau)
         double pos = (nfreq_ * sigma_)/(2 * beta_) * tauval + half_width_;
         unsigned start = pos;
         double delta = pos - start;
-        assert(start < conv_size() - 2 * half_width_);
+        assert(start < out_size() - window_width());
 
         // precompute second as well third term of:
         // a*exp[c*(l-delta)**2)]
@@ -75,7 +84,7 @@ void conv_gaussian::operator() (const T *in, T *out) const
 {
     // now do: buffer[l] += phi(l-delta) * fx for -m < l <= m
     for (unsigned i = 0; i != precomp_.size(); ++i) {
-        T *val = in[i] * precomp_[i].baseval;
+        T val = in[i] * precomp_[i].baseval;
         unsigned start = precomp_[i].start;
         for (unsigned p = start; p != start + 2 * half_width_; ++p) {
             out[p] += val;
@@ -83,5 +92,8 @@ void conv_gaussian::operator() (const T *in, T *out) const
         }
     }
 }
+
+template void conv_gaussian::operator()<>(const double *, double *) const;
+template void conv_gaussian::operator()<>(const std::complex<double>*, std::complex<double>*) const;
 
 }}
