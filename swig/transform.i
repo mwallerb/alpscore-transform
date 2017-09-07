@@ -34,6 +34,7 @@
 
 /* ---------------------------- */
 
+
 %ignore alps::fftw::alloc;
 %ignore alps::fftw::allocator::rebind;
 %ignore alps::fftw::wrapper::operator=;
@@ -58,4 +59,5 @@
 
 %include <alps/transform/nonuniform.hpp>
 
-
+%template(convolve_tauR) alps::transform::gaussian_window::convolve_tau<double>;
+%template(convolve_tauC) alps::transform::gaussian_window::convolve_tau< std::complex<double> >;
