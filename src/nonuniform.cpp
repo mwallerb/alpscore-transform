@@ -4,8 +4,8 @@
 
 namespace alps { namespace transform {
 
-gaussian_window::gaussian_window(unsigned nfreq, unsigned sigma,
-                                 unsigned half_width, double beta)
+conv_gaussian::conv_gaussian(unsigned nfreq, unsigned sigma,
+                             unsigned half_width, double beta)
     : nfreq_(nfreq)
     , sigma_(sigma)
     , half_width_(half_width)
@@ -19,13 +19,14 @@ gaussian_window::gaussian_window(unsigned nfreq, unsigned sigma,
 
     // Follows Staar et al (2012), eq. (C.1)
     unsigned m = half_width;
-    unsigned n = 4 * nfreq;
     double b = 2. * sigma/(2 * sigma - 1) * m/M_PI;
 
     tnorm_ = 1./std::sqrt(M_PI * b);
     texp_ = -1./b;
-    knorm_ = 1./n;
-    kexp_ = -b * M_PI * M_PI/(1. * n * n);
+
+    //unsigned n = 4 * nfreq;
+    //knorm_ = 1./n;
+    //kexp_ = -b * M_PI * M_PI/(1. * n * n);
 
     // for -m < l <= m, precompute first term of:
     // a*exp[c(l-delta)**2)] = a*exp[c*l**2] exp[c*delta**2] exp[-2*c*delta]**l
@@ -33,7 +34,7 @@ gaussian_window::gaussian_window(unsigned nfreq, unsigned sigma,
         lfact_[l + m - 1] = tnorm_ * std::exp(texp_ * l * l);
 }
 
-void gaussian_window::set_tau(double *tau, unsigned ntau)
+void conv_gaussian::set_tau(double *tau, unsigned ntau)
 {
     precomp_.resize(ntau);
 
@@ -70,7 +71,7 @@ void gaussian_window::set_tau(double *tau, unsigned ntau)
 }
 
 template <typename T>
-void gaussian_window::convolve_tau(const T *in, T *out) const
+void conv_gaussian::operator() (const T *in, T *out) const
 {
     // now do: buffer[l] += phi(l-delta) * fx for -m < l <= m
     for (unsigned i = 0; i != precomp_.size(); ++i) {

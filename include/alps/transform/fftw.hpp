@@ -25,11 +25,11 @@
 struct fftw_not_available : public std::exception
 { };
 
-#if defined(ALPS_HAVE_FFTW) || defined(ALPS_NO_WRAPPERS)
+#if defined(ALPS_HAVE_FFTW)
 
 #include <fftw3.h>
 
-#else /* ALPS_HAVE_FFTW */
+#elif !defined(ALPS_NO_WRAPPERS) /* ALPS_HAVE_FFTW */
 
 #include <cstdlib>
 #include <complex>

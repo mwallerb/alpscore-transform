@@ -14,35 +14,32 @@
 
 namespace alps { namespace transform {
 
-class gaussian_window
+class conv_gaussian
 {
 public:
-    gaussian_window();
+    conv_gaussian();
 
-    gaussian_window(unsigned nfreq, unsigned sigma, unsigned half_width,
-                    double beta);
+    conv_gaussian(unsigned nfreq, unsigned sigma, unsigned half_width,
+                  double beta);
 
     void set_tau(double *tau, unsigned ntau);
 
     template <typename T>
-    void convolve_tau(const T *in, T *out) const;
-
-    void deconvolve_freq(const std::complex<double> *in, std::complex<double> *out);
+    void operator() (const T *in, T *out) const;
 
     unsigned tau_size() const { return precomp_.size(); }
 
-    unsigned conv_size() const { return nfreq_ * sigma_ + 4 * half_width_; }
+    unsigned conv_size() const { return nfreq_ * sigma_ + 2 * width(); }
 
     unsigned freq_size() const { return nfreq_; }
 
-    template <typename T>
-    void convolve_fx_naive(const T *in, T *out);
+    unsigned width() const { return 2 * half_width_; }
 
 private:
     unsigned nfreq_, sigma_, half_width_;
     double beta_;
 
-    double tnorm_, texp_, knorm_, kexp_;
+    double tnorm_, texp_;
     std::vector<double> lfact_;
 
     struct tau_point {
@@ -53,8 +50,8 @@ private:
     std::vector<tau_point> precomp_;
 };
 
-template <> void gaussian_window::convolve_tau(const double *, double *) const;
-template <> void gaussian_window::convolve_tau(const std::complex<double>*, std::complex<double>*) const;
+template <> void conv_gaussian::operator()(const double *, double *) const;
+template <> void conv_gaussian::operator()(const std::complex<double>*, std::complex<double>*) const;
 
 } }
 
