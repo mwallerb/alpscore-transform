@@ -43,7 +43,7 @@ wrapper<InT, OutT>::wrapper(const plan_data &data)
 { }
 
 template <typename InT, typename OutT>
-wrapper<InT, OutT>::wrapper(wrapper &other)
+wrapper<InT, OutT>::wrapper(const wrapper &other)
     : data_(other.data_)
     , in_(other.in_)
     , out_(other.out_)

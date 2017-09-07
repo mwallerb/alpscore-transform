@@ -234,7 +234,7 @@ inline void execute_plan(const fftw_plan p, double *in, std::complex<double> *ou
  * Memory-safe wrapper for a FFTW plan.
  *
  * FFTW makes it fiendishly difficult to acquire memory safety, because there
- * is not API for cloning a plan and there is no portable way to extract the
+ * is no API for cloning a plan and there is no portable way to extract the
  * specifics of a plan since its hidden behind a opaque pointer.  Therefore,
  * we must store the properties of a plan and the corresponding arrays together
  * with the plan.
@@ -247,7 +247,7 @@ public:
 
     wrapper(const plan_data &data);
 
-    wrapper(wrapper &other);
+    wrapper(const wrapper &other);
 
 #if __cplusplus >= 201103L
     wrapper(wrapper &&other) : wrapper() { swap(*this, other); }
