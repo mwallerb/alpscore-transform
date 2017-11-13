@@ -23,7 +23,8 @@ void dft::operator() (const std::complex<double> *in, std::complex<double> *out)
         // copy to internal buffers
         std::copy(in, in + n_, fftw().in());
         fftw().execute();
-        std::copy(fftw().out(), fftw().out() + n_, out);
+        for (unsigned i = 0; i != n_; ++i)
+            out[i] += fftw().out()[i];
     } else {
         naive(in, out);
     }
@@ -40,7 +41,7 @@ void dft::naive(const std::complex<double> *in, std::complex<double> *out) const
             f_hatk += std::exp(std::complex<double>(0, p2piiIn * k * j))
                         * in[j];
         }
-        *(out++) = f_hatk;
+        *(out++) += f_hatk;
     }
 }
 
@@ -131,7 +132,8 @@ void tau_to_iw_real::operator() (const double *in, std::complex<double> *out)
     }
 
     fft_.execute();
-    std::copy(fft_.out(), fft_.out() + niw_, out);
+    for (unsigned i = 0; i != niw_; ++i)
+        out[i] += fft_.out()[i];
 }
 
 void tau_to_iw_real::naive(const double *in, std::complex<double> *out) const
