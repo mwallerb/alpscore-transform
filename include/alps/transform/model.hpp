@@ -38,15 +38,23 @@ public:
     typedef typename make_complex<T>::type ComplexT;
 
 public:
+    moments_model();
+
     moments_model(std::vector<T> mom, double beta, statistics stat);
 
-    ComplexT fiw(unsigned k) const;
+    ComplexT fiw(int k) const;
 
     T ftau(double tau) const;
 
 private:
     std::vector<T> mom_;
+    double beta_;
+    statistics stat_;
 };
+
+extern template class moments_model<double>;
+extern template class moments_model<std::complex<double> >;
+
 
 } }
 
