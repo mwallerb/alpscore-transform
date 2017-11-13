@@ -8,12 +8,15 @@
 
 #include <alps/transform/common.hpp>
 #include <alps/transform/fftw.hpp>
+#include <alps/transform/model.hpp>
 
 namespace alps { namespace transform {
 
 class dft;
 class iw_to_tau_real;
 class tau_to_iw_real;
+
+
 
 /**
  * Transformer representing a discrete Fourier transform.
@@ -88,6 +91,8 @@ public:
 
     statistics stat() const { return stat_; }
 
+    double tau_value(unsigned i) const { return beta_/ntau_ * i; }
+
     void naive(const std::complex<double> *in, double *out) const;
 
 private:
@@ -104,6 +109,40 @@ struct traits<iw_to_tau_real>
     typedef double out_type;
 };
 
+
+/**
+ * Transformation from Matsubara frequencies to imaginary time using a model
+ */
+class iw_to_tau_model_real
+{
+    iw_to_tau_model_real() { }
+
+    iw_to_tau_model_real(unsigned int niw, unsigned int ntau, double beta,
+                         statistics stat, const std::vector<double> &moments,
+                         bool use_fftw=alps::fftw::SUPPORTED);
+
+    void operator() (const std::complex<double> *in, double *out);
+
+    unsigned in_size() const { return transform_.in_size(); }
+
+    unsigned out_size() const { return transform_.out_size(); }
+
+    double beta() const { return transform_.beta(); }
+
+    statistics stat() const { return transform_.stat(); }
+
+private:
+    iw_to_tau_real transform_;
+    moments_model<double> model_;
+    std::vector< std::complex<double> > in_buffer_;
+};
+
+template<>
+struct traits<iw_to_tau_model_real>
+{
+    typedef std::complex<double> in_type;
+    typedef double out_type;
+};
 
 /**
  * Transformation from imaginary time to positive Matsubara frequencies.

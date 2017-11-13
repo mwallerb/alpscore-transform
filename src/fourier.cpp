@@ -96,6 +96,33 @@ void iw_to_tau_real::naive(const std::complex<double> *in, double *out) const
     }
 }
 
+
+iw_to_tau_model_real::iw_to_tau_model_real(
+                            unsigned niw, unsigned ntau, double beta,
+                            statistics stat, const std::vector<double> &moments,
+                            bool use_fftw)
+    : transform_(niw, ntau, beta, stat, use_fftw)
+    , model_(moments, beta, stat)
+    , in_buffer_(transform_.in_size())
+{ }
+
+void iw_to_tau_model_real::operator() (const std::complex<double> *in, double *out)
+{
+    std::copy(in, in + transform_.in_size(), in_buffer_.begin());
+
+    // remove model in frequency space
+    for (unsigned n = 0; n != transform_.in_size(); ++n)
+        in_buffer_[n] -= model_.fiw(n);
+
+    // do transform
+    transform_(&in_buffer_[0], out);
+
+    // add model in tau space
+    for (unsigned n = 0; n != transform_.out_size(); ++n)
+        out[n] += model_.ftau(transform_.tau_value(n));
+}
+
+
 tau_to_iw_real::tau_to_iw_real(unsigned ntau, unsigned niw, double beta,
                                statistics stat, bool use_fftw)
     : niw_(niw)
