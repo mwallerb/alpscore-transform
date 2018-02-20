@@ -134,7 +134,7 @@ if(WITH_GTEST)
     enable_testing()
     include_directories(${GTEST_INCLUDE_DIR})
 
-    set(TESTCASES fourier)
+    set(TESTCASES consistency)
     foreach (test_name ${TESTCASES})
         set(test_target test_${test_name})
         add_executable(${test_target} test/${test_name}.cpp)
